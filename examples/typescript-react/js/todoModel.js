@@ -14,10 +14,11 @@ var TodoModel = (function () {
         utils_1.Utils.store(this.key, this.todos);
         this.onChanges.forEach(function (cb) { cb(); });
     };
-    TodoModel.prototype.addTodo = function (title) {
+    TodoModel.prototype.addTodo = function (title, tags) {
         this.todos = this.todos.concat({
             id: utils_1.Utils.uuid(),
             title: title,
+            tags: tags,
             completed: false
         });
         this.inform();
@@ -42,9 +43,9 @@ var TodoModel = (function () {
         });
         this.inform();
     };
-    TodoModel.prototype.save = function (todoToSave, text) {
+    TodoModel.prototype.save = function (todoToSave, title, tags) {
         this.todos = this.todos.map(function (todo) {
-            return todo !== todoToSave ? todo : utils_1.Utils.extend({}, todo, { title: text });
+            return todo !== todoToSave ? todo : utils_1.Utils.extend({}, todo, { title: title, tags: tags });
         });
         this.inform();
     };
