@@ -18,14 +18,24 @@ var TodoItem = (function (_super) {
     __extends(TodoItem, _super);
     function TodoItem(props) {
         var _this = _super.call(this, props) || this;
-        _this.state = { editText: _this.props.todo.title };
+        _this.state = { editText: _this.props.todo.title.concat(' ', _this.props.todo.tags) };
         return _this;
     }
     TodoItem.prototype.handleSubmit = function (event) {
-        var val = this.state.editText.trim();
+        var val = this.state.editText;
+        var textValue;
+        var tagsValue;
+        if (val.indexOf('@') >= 0) {
+            textValue = val.substring(0, val.indexOf("@"));
+            tagsValue = val.substring(val.indexOf("@"));
+        }
+        else {
+            textValue = val;
+            tagsValue = '';
+        }
         if (val) {
-            this.props.onSave(val);
-            this.setState({ editText: val });
+            this.props.onSave([textValue, tagsValue]);
+            this.setState({ editText: textValue.concat(' ', tagsValue) });
         }
         else {
             this.props.onDestroy();
@@ -33,11 +43,11 @@ var TodoItem = (function (_super) {
     };
     TodoItem.prototype.handleEdit = function () {
         this.props.onEdit();
-        this.setState({ editText: this.props.todo.title });
+        this.setState({ editText: this.props.todo.title.concat(' ', this.props.todo.tags) });
     };
     TodoItem.prototype.handleKeyDown = function (event) {
         if (event.keyCode === constants_1.ESCAPE_KEY) {
-            this.setState({ editText: this.props.todo.title });
+            this.setState({ editText: this.props.todo.title.concat(' ', this.props.todo.tags) });
             this.props.onCancel(event);
         }
         else if (event.keyCode === constants_1.ENTER_KEY) {
@@ -69,6 +79,7 @@ var TodoItem = (function (_super) {
             React.createElement("div", { className: "view" },
                 React.createElement("input", { className: "toggle", type: "checkbox", checked: this.props.todo.completed, onChange: this.props.onToggle }),
                 React.createElement("label", { onDoubleClick: function (e) { return _this.handleEdit(); } }, this.props.todo.title),
+                React.createElement("label", { onDoubleClick: function (e) { return _this.handleEdit(); }, className: "tags-label" }, this.props.todo.tags ? this.props.todo.tags : "n/a"),
                 React.createElement("button", { className: "destroy", onClick: this.props.onDestroy })),
             React.createElement("input", { ref: "editField", className: "edit", value: this.state.editText, onBlur: function (e) { return _this.handleSubmit(e); }, onChange: function (e) { return _this.handleChange(e); }, onKeyDown: function (e) { return _this.handleKeyDown(e); } })));
     };

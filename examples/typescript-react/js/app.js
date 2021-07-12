@@ -41,8 +41,17 @@ var TodoApp = (function (_super) {
         }
         event.preventDefault();
         var val = ReactDOM.findDOMNode(this.refs["newField"]).value.trim();
+        if (val.indexOf('@') >= 0) {
+            var textValue = val.substring(0, val.indexOf("@"));
+            var tagsValue = val.substring(val.indexOf("@"));
+        }
+        else {
+            textValue = val;
+            tagsValue = '';
+        }
+        ;
         if (val) {
-            this.props.model.addTodo(val);
+            this.props.model.addTodo(textValue, tagsValue);
             ReactDOM.findDOMNode(this.refs["newField"]).value = '';
         }
     };
@@ -61,7 +70,7 @@ var TodoApp = (function (_super) {
         this.setState({ editing: todo.id });
     };
     TodoApp.prototype.save = function (todoToSave, text) {
-        this.props.model.save(todoToSave, text);
+        this.props.model.save(todoToSave, text[0], text[1]);
         this.setState({ editing: null });
     };
     TodoApp.prototype.cancel = function () {

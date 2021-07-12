@@ -17,14 +17,25 @@ class TodoItem extends React.Component<ITodoItemProps, ITodoItemState> {
 
   constructor(props : ITodoItemProps){
     super(props);
-    this.state = { editText: this.props.todo.title };
+    this.state = { editText: this.props.todo.title.concat(' ', this.props.todo.tags) };
   }
 
   public handleSubmit(event : React.FormEvent) {
-    var val = this.state.editText.trim();
+    var val = this.state.editText;
+    let textValue;
+    let tagsValue;
+
+    if (val.indexOf('@') >= 0) {
+      textValue = val.substring(0, val.indexOf("@"));
+      tagsValue = val.substring(val.indexOf("@"));
+    }
+    else {
+        textValue = val;
+        tagsValue = '';
+    }
     if (val) {
-      this.props.onSave(val);
-      this.setState({editText: val});
+      this.props.onSave([textValue, tagsValue]);
+      this.setState({editText: textValue.concat(' ', tagsValue)});
     } else {
       this.props.onDestroy();
     }
@@ -32,12 +43,12 @@ class TodoItem extends React.Component<ITodoItemProps, ITodoItemState> {
 
   public handleEdit() {
     this.props.onEdit();
-    this.setState({editText: this.props.todo.title});
+    this.setState({editText: this.props.todo.title.concat(' ', this.props.todo.tags)});
   }
 
   public handleKeyDown(event : React.KeyboardEvent) {
     if (event.keyCode === ESCAPE_KEY) {
-      this.setState({editText: this.props.todo.title});
+      this.setState({editText: this.props.todo.title.concat(' ', this.props.todo.tags)});
       this.props.onCancel(event);
     } else if (event.keyCode === ENTER_KEY) {
       this.handleSubmit(event);
@@ -94,6 +105,9 @@ class TodoItem extends React.Component<ITodoItemProps, ITodoItemState> {
           <label onDoubleClick={ e => this.handleEdit() }>
             {this.props.todo.title}
           </label>
+          <label onDoubleClick={ e => this.handleEdit()} className="tags-label">
+            {this.props.todo.tags ? this.props.todo.tags  : "N/A"}
+          </label >
           <button className="destroy" onClick={this.props.onDestroy} />
         </div>
         <input
